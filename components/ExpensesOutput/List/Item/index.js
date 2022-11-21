@@ -1,13 +1,14 @@
 import { Pressable, View, Text, StyleSheet } from "react-native";
 
 import { theme } from "../../../../constants/theme";
+import { getFormattedDate } from "../../../../utils/date";
 
 const Item = ({ expense }) => {
   return (
     <Pressable>
       <View style={styles.itemContainer}>
-        <Text>{expense.date.toString()}</Text>
-        <Text>{expense.amount}</Text>
+        <Text>{getFormattedDate(expense.date)}</Text>
+        <Text>{expense.amount.toFixed(2)}</Text>
       </View>
     </Pressable>
   );
