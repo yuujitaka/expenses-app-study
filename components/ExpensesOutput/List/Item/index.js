@@ -1,14 +1,22 @@
 import { Pressable, View, Text, StyleSheet } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 import { theme } from "../../../../constants/theme";
 import { getFormattedDate } from "../../../../utils/date";
 
 const Item = ({ expense }) => {
+  const navigation = useNavigation();
+
+  const expanseHandler = () => {
+    navigation.navigate("Management", { expenseId: expense.id });
+  };
+
   return (
-    <Pressable>
+    <Pressable onPress={expanseHandler}>
       <View style={styles.itemContainer}>
+        <Text>{expense.description}</Text>
         <Text>{getFormattedDate(expense.date)}</Text>
-        <Text>{expense.amount.toFixed(2)}</Text>
+        <Text>${expense.amount.toFixed(2)}</Text>
       </View>
     </Pressable>
   );
