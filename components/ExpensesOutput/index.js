@@ -11,7 +11,11 @@ const ExpensesOutput = ({ expenses, period }) => {
         <Text>{period}</Text>
         <Text>${expensesSum.toFixed(2)}</Text>
       </View>
-      <List expenses={expenses} />
+      {expenses.length ? (
+        <List expenses={expenses} />
+      ) : (
+        <Text>No Expenses found</Text>
+      )}
     </View>
   );
 };

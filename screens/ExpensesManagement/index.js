@@ -4,14 +4,14 @@ import { useContext, useLayoutEffect } from "react";
 import { ExpenseContext } from "../../context/Expense";
 import IconButton from "../../components/IconButton";
 import { theme } from "../../constants/theme";
-import CustomButton from "../../components/CustomButtom";
+import ExpenseForm from "./ExpenseForm";
 
 const ExpensesManagement = ({ route, navigation }) => {
   const expenseId = route.params?.expenseId;
-
   const isEditing = !!expenseId;
-  const { deleteExpense, addExpense, updateExpense } =
+  const { expenses, deleteExpense, addExpense, updateExpense } =
     useContext(ExpenseContext);
+  const selectedExpense = expenses.find((expense) => expense.id === expenseId);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -23,23 +23,16 @@ const ExpensesManagement = ({ route, navigation }) => {
     deleteExpense(expenseId);
     navigation.goBack();
   };
+
   const cancelHandler = () => {
     navigation.goBack();
   };
-  const confirmHandler = () => {
+
+  const confirmHandler = (expenseData) => {
     if (isEditing) {
-      updateExpense(expenseId, {
-        description: "updated",
-        amount: 10.0,
-        date: new Date(),
-      });
+      updateExpense(expenseId, expenseData);
     } else {
-      addExpense({
-        description: `test-${Math.random().toFixed(3)}`,
-        amount: 10.9,
-        date: new Date(),
-        id: Math.random().toString(),
-      });
+      addExpense(expenseData);
     }
 
     navigation.goBack();
@@ -47,21 +40,20 @@ const ExpensesManagement = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.buttons}>
-        <CustomButton mode="flat" onPress={cancelHandler}>
-          Cancel
-        </CustomButton>
-        <CustomButton onPress={confirmHandler}>
-          {isEditing ? "Update" : "Add"}
-        </CustomButton>
-      </View>
+      <ExpenseForm
+        onCancel={cancelHandler}
+        onSubmit={confirmHandler}
+        selectedExpense={selectedExpense}
+      />
       {isEditing && (
-        <IconButton
-          name="trash"
-          color={theme.colors.error[100]}
-          size={36}
-          onPress={deleteHandler}
-        />
+        <View style={styles.deleteContainer}>
+          <IconButton
+            name="trash"
+            color={theme.colors.error[100]}
+            size={36}
+            onPress={deleteHandler}
+          />
+        </View>
       )}
     </View>
   );
@@ -71,11 +63,15 @@ export default ExpensesManagement;
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: "center",
+    flex: 1,
+    padding: 24,
   },
-  buttons: {
-    flexDirection: "row",
-    justifyContent: "center",
-    lignItems: "center",
+
+  deleteContainer: {
+    marginTop: 16,
+    paddingTop: 8,
+    borderTopWidth: 2,
+    borderTopColor: theme.colors.primary[10],
+    alignItems: "center",
   },
 });
