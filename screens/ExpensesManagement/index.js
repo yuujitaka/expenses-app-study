@@ -2,6 +2,7 @@ import { StyleSheet, View } from "react-native";
 import { useContext, useLayoutEffect } from "react";
 
 import { ExpenseContext } from "../../context/Expense";
+import { storeExpense } from "../../services/ExpenseAPI";
 import IconButton from "../../components/IconButton";
 import { theme } from "../../constants/theme";
 import ExpenseForm from "./ExpenseForm";
@@ -32,6 +33,7 @@ const ExpensesManagement = ({ route, navigation }) => {
     if (isEditing) {
       updateExpense(expenseId, expenseData);
     } else {
+      storeExpense(expenseData);
       addExpense(expenseData);
     }
 
