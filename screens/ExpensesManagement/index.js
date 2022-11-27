@@ -2,7 +2,11 @@ import { StyleSheet, View } from "react-native";
 import { useContext, useLayoutEffect } from "react";
 
 import { ExpenseContext } from "../../context/Expense";
-import { storeExpense } from "../../services/ExpenseAPI";
+import {
+  storeExpense,
+  putExpense,
+  deleteExpense,
+} from "../../services/ExpenseAPI";
 import IconButton from "../../components/IconButton";
 import { theme } from "../../constants/theme";
 import ExpenseForm from "./ExpenseForm";
@@ -10,7 +14,7 @@ import ExpenseForm from "./ExpenseForm";
 const ExpensesManagement = ({ route, navigation }) => {
   const expenseId = route.params?.expenseId;
   const isEditing = !!expenseId;
-  const { expenses, deleteExpense, addExpense, updateExpense } =
+  const { expenses, removeExpense, addExpense, updateExpense } =
     useContext(ExpenseContext);
   const selectedExpense = expenses.find((expense) => expense.id === expenseId);
 
@@ -20,8 +24,10 @@ const ExpensesManagement = ({ route, navigation }) => {
     });
   }, [navigation, isEditing]);
 
-  const deleteHandler = () => {
-    deleteExpense(expenseId);
+  const deleteHandler = async () => {
+    await deleteExpense(expenseId);
+    removeExpense(expenseId);
+
     navigation.goBack();
   };
 
@@ -29,12 +35,13 @@ const ExpensesManagement = ({ route, navigation }) => {
     navigation.goBack();
   };
 
-  const confirmHandler = (expenseData) => {
+  const confirmHandler = async (expenseData) => {
     if (isEditing) {
+      await putExpense(expenseId, expenseData);
       updateExpense(expenseId, expenseData);
     } else {
-      storeExpense(expenseData);
-      addExpense(expenseData);
+      const id = await storeExpense(expenseData);
+      addExpense({ id, ...expenseData });
     }
 
     navigation.goBack();

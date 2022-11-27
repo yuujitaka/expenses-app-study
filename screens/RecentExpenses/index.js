@@ -4,9 +4,11 @@ import ExpensesOutput from "../../components/ExpensesOutput";
 import { ExpenseContext } from "../../context/Expense";
 import { getDateMinusDays } from "../../utils/date";
 import { fetchExpenses } from "../../services/ExpenseAPI";
+import Loading from "../../components/Loading";
 
 const RecentExpenses = () => {
   const { expenses, setExpenses } = useContext(ExpenseContext);
+  const [isFetching, setIsFetching] = useState(true);
 
   const recentExpenses = expenses.filter((expense) => {
     const today = new Date();
@@ -15,14 +17,25 @@ const RecentExpenses = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsFetching(true);
       const response = await fetchExpenses();
+      setIsFetching(false);
       setExpenses(response);
     };
 
     fetchData();
   }, []);
 
-  return <ExpensesOutput expenses={recentExpenses} period="Last 7 days" />;
+  return (
+    <>
+      {isFetching ? (
+        <Loading />
+      ) : (
+        <ExpensesOutput expenses={recentExpenses} period="Last 7 days" />
+      )}
+      ;
+    </>
+  );
 };
 
 export default RecentExpenses;

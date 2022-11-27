@@ -4,17 +4,17 @@ export const ExpenseContext = createContext({
   expenses: [],
   addExpense: () => {},
   setExpenses: () => {},
-  deleteExpense: () => {},
+  removeExpense: () => {},
   updateExpense: () => {},
 });
 
 const expensesReducer = (state, action) => {
   switch (action.type) {
     case "ADD":
-      const id = new Date().toString() + Math.random().toString();
-      return [{ ...action.payload, id }, ...state];
+      return [action.payload, ...state];
     case "SET":
-      return action.payload;
+      const inverted = action.payload.reverse();
+      return inverted;
     case "UPDATE":
       const expenseId = state.findIndex(
         (expense) => expense.id === action.payload.id
@@ -42,7 +42,7 @@ const ExpenseContextProvider = ({ children }) => {
     dispatch({ type: "SET", payload: expenses });
   };
 
-  const deleteExpense = (id) => {
+  const removeExpense = (id) => {
     dispatch({ type: "DELETE", payload: id });
   };
 
@@ -54,7 +54,7 @@ const ExpenseContextProvider = ({ children }) => {
     expenses: expensesState,
     addExpense,
     setExpenses,
-    deleteExpense,
+    removeExpense,
     updateExpense,
   };
 

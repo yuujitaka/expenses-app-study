@@ -2,7 +2,7 @@ import api from "../api";
 
 export const storeExpense = async (expenseData) => {
   const response = await api.post("/expenses.json", expenseData);
-  return response;
+  return response.data.name;
 };
 
 export const fetchExpenses = async () => {
@@ -15,4 +15,14 @@ export const fetchExpenses = async () => {
   }));
 
   return expensesList;
+};
+
+export const putExpense = async (id, expenseData) => {
+  const response = await api.put(`/expenses/${id}.json`, expenseData);
+  return response;
+};
+
+export const deleteExpense = async (id) => {
+  const response = await api.delete(`/expenses/${id}.json`);
+  return response;
 };
