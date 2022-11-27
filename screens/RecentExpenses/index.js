@@ -33,7 +33,6 @@ const RecentExpenses = () => {
       ) : (
         <ExpensesOutput expenses={recentExpenses} period="Last 7 days" />
       )}
-      ;
     </>
   );
 };
