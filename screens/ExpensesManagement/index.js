@@ -1,5 +1,5 @@
 import { StyleSheet, View } from "react-native";
-import { useContext, useLayoutEffect } from "react";
+import { useContext, useLayoutEffect, useState } from "react";
 
 import { ExpenseContext } from "../../context/Expense";
 import {
@@ -10,8 +10,12 @@ import {
 import IconButton from "../../components/IconButton";
 import { theme } from "../../constants/theme";
 import ExpenseForm from "./ExpenseForm";
+import Loading from "../../components/Loading";
+import ErrorOverlay from "../../components/ErrorOverlay";
 
 const ExpensesManagement = ({ route, navigation }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
   const expenseId = route.params?.expenseId;
   const isEditing = !!expenseId;
   const { expenses, removeExpense, addExpense, updateExpense } =
@@ -25,10 +29,15 @@ const ExpensesManagement = ({ route, navigation }) => {
   }, [navigation, isEditing]);
 
   const deleteHandler = async () => {
-    await deleteExpense(expenseId);
-    removeExpense(expenseId);
-
-    navigation.goBack();
+    setIsSubmitting(true);
+    try {
+      await deleteExpense(expenseId);
+      removeExpense(expenseId);
+      navigation.goBack();
+    } catch (error) {
+      setError("Could not delete expense");
+      setIsSubmitting(false);
+    }
   };
 
   const cancelHandler = () => {
@@ -36,16 +45,34 @@ const ExpensesManagement = ({ route, navigation }) => {
   };
 
   const confirmHandler = async (expenseData) => {
-    if (isEditing) {
-      await putExpense(expenseId, expenseData);
-      updateExpense(expenseId, expenseData);
-    } else {
-      const id = await storeExpense(expenseData);
-      addExpense({ id, ...expenseData });
-    }
+    setIsSubmitting(true);
+    try {
+      if (isEditing) {
+        await putExpense(expenseId, expenseData);
+        updateExpense(expenseId, expenseData);
+      } else {
+        const id = await storeExpense(expenseData);
+        addExpense({ id, ...expenseData });
+      }
 
-    navigation.goBack();
+      navigation.goBack();
+    } catch (error) {
+      setError("Could not save data");
+      setIsSubmitting(false);
+    }
   };
+
+  const errorHandler = () => {
+    setError(null);
+  };
+
+  if (error && !isSubmitting) {
+    return <ErrorOverlay message={error} onConfirm={errorHandler} />;
+  }
+
+  if (isSubmitting) {
+    return <Loading message={error} onConfirm={errorHandler} />;
+  }
 
   return (
     <View style={styles.container}>
